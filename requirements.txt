@@ -4,7 +4,7 @@
 
 # --- Agent / orchestration ---
 langgraph==0.2.62
-langchain-core==0.3.28
+langchain-core==0.3.85
 langchain-openai==0.2.14
 openai==1.58.1
 
