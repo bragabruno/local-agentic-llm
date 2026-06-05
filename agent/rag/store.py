@@ -32,12 +32,11 @@ class VectorStore:
         import chromadb
         from chromadb.utils import embedding_functions
 
-        # Typed as Any: chromadb's EmbeddingFunction protocol is invariant over its input
-        # type, which conflicts with the SentenceTransformer function's narrower signature.
-        # This is third-party stub variance, not a real mismatch at runtime.
-        embedder: Any = embedding_functions.SentenceTransformerEmbeddingFunction(
-            model_name=embed_model
-        )
+        # Access through an Any alias: chromadb dynamically exports the embedding functions
+        # (so the attribute isn't statically known) and its EmbeddingFunction protocol is
+        # invariant over input type. Both trip static checks that don't reflect runtime.
+        ef_module: Any = embedding_functions
+        embedder: Any = ef_module.SentenceTransformerEmbeddingFunction(model_name=embed_model)
         self._embedder = embedder
         self._client = chromadb.PersistentClient(path=persist_dir)
         self._collection = self._client.get_or_create_collection(
