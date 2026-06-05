@@ -31,10 +31,11 @@ class AgentState(TypedDict):
 def _build_model(config: AgentConfig, tools: dict[str, Tool]) -> Any:
     """Construct a tool-bound ChatOpenAI pointed at the local endpoint."""
     from langchain_openai import ChatOpenAI
+    from pydantic import SecretStr
 
     model = ChatOpenAI(
         base_url=config.base_url,
-        api_key=config.api_key,
+        api_key=SecretStr(config.api_key),
         model=config.model,
         temperature=config.temperature,
     )
