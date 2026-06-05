@@ -15,6 +15,7 @@ Exits non-zero if the probe fails, so it can gate a quant choice in a script.
 from __future__ import annotations
 
 import sys
+from typing import Any
 
 from agent.config import AgentConfig
 from agent.tools.calculator import calculator_tool
@@ -26,14 +27,18 @@ def run_probe(config: AgentConfig | None = None) -> bool:
     from openai import OpenAI
 
     client = OpenAI(base_url=config.base_url, api_key=config.api_key)
+    # Schemas are plain dicts (valid at runtime); typed as Any to satisfy the SDK's
+    # TypedDict parameter types without restating them here.
+    tools: Any = [calculator_tool.openai_schema()]
+    messages: Any = [
+        {"role": "system", "content": "Use the calculator tool for any arithmetic."},
+        {"role": "user", "content": "What is (137 + 49) * 3? Use the tool."},
+    ]
     resp = client.chat.completions.create(
         model=config.model,
         temperature=0,
-        tools=[calculator_tool.openai_schema()],
-        messages=[
-            {"role": "system", "content": "Use the calculator tool for any arithmetic."},
-            {"role": "user", "content": "What is (137 + 49) * 3? Use the tool."},
-        ],
+        tools=tools,
+        messages=messages,
     )
     msg = resp.choices[0].message
     calls = msg.tool_calls or []
@@ -41,8 +46,16 @@ def run_probe(config: AgentConfig | None = None) -> bool:
         print("FAIL: model did not emit a tool call")
         return False
     call = calls[0]
-    print(f"tool={call.function.name} args={call.function.arguments}")
-    ok = call.function.name == "calculator" and "137" in call.function.arguments
+    # Newer openai types model tool calls as a union (function vs custom tool); a local
+    # function-calling model returns the function variant. Access defensively so we don't
+    # depend on a specific union member type.
+    fn = getattr(call, "function", None)
+    if fn is None:
+        print("FAIL: tool call carried no function payload")
+        return False
+    name, args = fn.name, fn.arguments
+    print(f"tool={name} args={args}")
+    ok = name == "calculator" and "137" in args
     print("PASS" if ok else "FAIL: wrong tool/args")
     return ok
 
