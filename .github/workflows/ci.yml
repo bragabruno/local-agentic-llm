@@ -27,7 +27,8 @@ jobs:
           ruff format --check .
 
       - name: Typecheck (mypy)
-        run: mypy agent eval
+        # Whole-tree so it works across branches where eval/ may not exist yet.
+        run: mypy .
 
       - name: Tests (pytest)
         # Exit code 5 = "no tests collected" — tolerated until suites land. Any real
