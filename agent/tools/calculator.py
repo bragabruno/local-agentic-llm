@@ -31,7 +31,7 @@ def _eval_node(node: ast.AST) -> float:
     if isinstance(node, ast.Expression):
         return _eval_node(node.body)
     if isinstance(node, ast.Constant):
-        if isinstance(node.value, bool) or not isinstance(node.value, (int, float)):
+        if isinstance(node.value, bool) or not isinstance(node.value, int | float):
             raise ToolError(f"unsupported constant: {node.value!r}")
         return float(node.value)
     if isinstance(node, ast.BinOp):

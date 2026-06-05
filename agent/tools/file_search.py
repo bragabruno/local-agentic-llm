@@ -62,7 +62,7 @@ def file_search(query: str, subdir: str = ".") -> str:
 
 file_search_tool = Tool(
     name="file_search",
-    description="Search text files under the project for a substring; returns path:line: text hits.",
+    description="Search project text files for a substring; returns path:line: text hits.",
     parameters={
         "type": "object",
         "properties": {
