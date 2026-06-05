@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+from typing import Any
 
 from .chunk import chunk_text
 
@@ -31,12 +32,16 @@ class VectorStore:
         import chromadb
         from chromadb.utils import embedding_functions
 
-        self._embedder = embedding_functions.SentenceTransformerEmbeddingFunction(
+        # Typed as Any: chromadb's EmbeddingFunction protocol is invariant over its input
+        # type, which conflicts with the SentenceTransformer function's narrower signature.
+        # This is third-party stub variance, not a real mismatch at runtime.
+        embedder: Any = embedding_functions.SentenceTransformerEmbeddingFunction(
             model_name=embed_model
         )
+        self._embedder = embedder
         self._client = chromadb.PersistentClient(path=persist_dir)
         self._collection = self._client.get_or_create_collection(
-            name=collection, embedding_function=self._embedder
+            name=collection, embedding_function=embedder
         )
 
     def add_text(self, doc_id: str, text: str, max_chars: int = 1000) -> int:
