@@ -3,7 +3,7 @@
 # All pins are well-established releases (no dependency newer than the project start).
 
 # --- Agent / orchestration ---
-langgraph==0.2.62
+langgraph==1.0.10rc1
 langchain-core==0.3.85
 langchain-openai==0.2.14
 openai==1.58.1
