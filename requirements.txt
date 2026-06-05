@@ -1,0 +1,24 @@
+# Pinned, conservative versions. No `latest`. Confirm against the index before install —
+# tagged [verify] per the project's version-drift discipline (see docs/plan).
+# All pins are well-established releases (no dependency newer than the project start).
+
+# --- Agent / orchestration ---
+langgraph==0.2.62
+langchain-core==0.3.28
+langchain-openai==0.2.14
+openai==1.58.1
+
+# --- RAG ---
+chromadb==0.5.23
+sentence-transformers==3.3.1
+
+# --- Utilities ---
+tiktoken==0.8.0
+pydantic==2.10.4
+httpx==0.27.2
+
+# --- Dev / quality (see pyproject.toml for config) ---
+ruff==0.8.4
+mypy==1.13.0
+pytest==8.3.4
+pytest-asyncio==0.24.0
